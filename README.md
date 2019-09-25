@@ -1,4 +1,4 @@
-# ODAS Studio
+# ISSA Audio recording App - A modification of ODAS Studio
 A desktop user interface for the [ODAS](https://github.com/introlab/odas) library
 
 ![ODAS Studio main screen screenshot](/screenshots/main.png)
