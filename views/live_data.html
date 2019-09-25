@@ -32,9 +32,12 @@
 
                 <div class="collapse navbar-collapse" id="navbar-content">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#" onclick="ipcRenderer.send('open-configure-window')">Configure</a></li>
+                        <!--<li><a href="#" onclick="ipcRenderer.send('open-configure-window')">Configure</a></li>
                         <li><a href="#" onclick="ipcRenderer.send('open-recordings-window')">Record</a></li>
-                        <li><a href="#" onclick="ipcRenderer.send('open-share-window')">Camera</a></li>
+                        <li><a href="#" onclick="ipcRenderer.send('open-recordings-window')"></a></li>
+                        <li><a href="#" onclick="ipcRenderer.send('open-share-window')">Camera</a></li>-->
+                        <li><a href="#" onclick="ipcRenderer.send('open-recordings-window')">Record</a></li>
+                        <li><a href="#" onclick="ipcRenderer.send('open-recordings-ISSA')">Record ISSA</a></li>
                     </ul>
                 </div>
 
@@ -157,7 +160,7 @@
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <p class="col-xs-10 text-muted">Graphic interface for ODAS library</p>
+                        <p class="col-xs-10 text-muted">ISSA recording app - A modification of the Graphic interface for ODAS library</p>
                         <a href="#" class="col-xs-2 text-right" onclick="openLegalWindow()">Legal</a>
                     </div>
                 </div>

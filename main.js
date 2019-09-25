@@ -28,6 +28,8 @@ function createWindow () {
     show: false
   })
 
+  //odasStudio.mainWindow.webContents.openDevTools();
+
 
   // and load the index.html of the app.
   odasStudio.mainWindow.loadURL(url.format({
@@ -37,7 +39,7 @@ function createWindow () {
   }))
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  //odasStudio.mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   odasStudio.mainWindow.on('closed', function () {

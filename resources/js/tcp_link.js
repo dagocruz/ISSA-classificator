@@ -31,17 +31,20 @@ const processTracking = function(event, msg) {
     currentFrame.timestamp = data.timeStamp;
 
     var newMap = {};
+    // push the number of socurces
     var indexPool = [];
-    rgbValueStrings.forEach(function(c,index) {
-        indexPool.push(index);
-    });
+    //console.log('rgbValues: '+rgbValueStrings);
+    //rgbValueStrings.forEach(function(c,index) {
+    //    indexPool.push(index);
+    //});
+    indexPool.push(0);
     var hasNewSource = false;
 
     data.src = data.src.filter(function(s) {
         return s.id !== 0;
     });
-
-    if(data.src) {    // If frame contains sources
+    //console.log(data.src);
+    if(data.src.length) {    // If frame contains sources
 
         data.src.forEach(function(src) {  // Remove still used index from the pool
 
@@ -59,24 +62,29 @@ const processTracking = function(event, msg) {
             }
 
             else {  // Source is new
-
+                //Como  es una nueva fuente va a utilizar un nuevo recorder que al final de cuentas tienen los mismos valores
+                
                 newMap[src.id] = indexPool.shift(); // Get unused index from pool
                 console.log('insert into map ', newMap[src.id].toString() + ' ' + src.id.toString());
 
                 currentFrame.sources[newMap[src.id]].id = src.id;
                 hasNewSource = true;
-
-                ipcRenderer.send('new-recording',newMap[src.id],src.id)
+                ipcRenderer.send('available-to-record',newMap[src.id],src.id,true);
+                //ipcRenderer.send('new-recording',newMap[src.id],src.id)
             }
 
             currentFrame.sources[newMap[src.id]].x = src.x;
             currentFrame.sources[newMap[src.id]].y = src.y;
             currentFrame.sources[newMap[src.id]].z = src.z;
-
+            ipcRenderer.send('add-coor',{x:src.x,y:src.y,z:src.z});
             currentFrame.sources[newMap[src.id]].active = !(src.x==0 && src.y==0 && src.z==0);
 
         });
 
+    }
+    else{
+        //console.log('no hay senial');
+        ipcRenderer.send('available-to-record',null,null,false); 
     }
 
     indexMap = newMap;
@@ -95,6 +103,9 @@ const processTracking = function(event, msg) {
         ipcRenderer.send('end-recording',index)
     });
 
+    
+
+    //document.dispatchEvent(new Event('available-to-record'));
     // Trigger update
     document.dispatchEvent(new Event('tracking'));
 

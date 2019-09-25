@@ -1381,9 +1381,20 @@ a.text-danger:focus {
   color: #fff;
   background-color: #00994d;
 }
+
+.bg-primary-issa {
+  color: #fff;
+  background-color: #1a5da1;
+}
+
 a.bg-primary:hover,
 a.bg-primary:focus {
   background-color: #006633;
+}
+
+a.bg-primary-issa:hover,
+a.bg-primary-issa:focus {
+  background-color: #003c6e;
 }
 .bg-success {
   background-color: #dff0d8;

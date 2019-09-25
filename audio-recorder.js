@@ -4,9 +4,13 @@ const wav = require('wav')
 const EventEmitter = require('events');
 const appSettings = require('./settings.js').appSettings;
 
+
+
+
 /*
  * Audio parameters
  */
+
 
 const bitNumber = 16
 
@@ -96,6 +100,8 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
     }
 
     startRecording(id) {
+        console.log('audio-recorder.js new-recording');
+        console.log('recordingEnabled: '+this.recordingEnabled);
         if(this.recordingEnabled) {
             if(typeof(this.writer) !== 'undefined') {	// Verify that previous recording is cleared
 
@@ -126,7 +132,8 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
 
             let datetimeString = dateString + "_" + timeString
 
-            let filename = path.join(this.workspacePath, `ODAS_${id}_${datetimeString}_${this.suffix}.wav`)
+            //let filename = path.join(this.workspacePath, `_ISSA_${id}_${datetimeString}_${this.suffix}.wav`)
+            let filename = this.workspacePath+`_ISSA_${id}_${datetimeString}_${this.suffix}.wav`
             this.path = filename
 
             try {
@@ -167,7 +174,7 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
 
                 console.log(`Registered header on recorder ${this.index}`);
                 this.emit('add-recording', this.writer.path);
-
+    
                 this.writer = undefined;
                 console.log(`Recorder ${this.index} undefined`);
 
@@ -176,12 +183,17 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
     }
 
     enableRecording(workspacePath) {
+        console.log('audio-recorder.js start-recording');
+        
         this.recordingEnabled = true;
+        console.log('renableRecording ecordingEnabled: '+this.recordingEnabled);
         this.workspacePath = workspacePath;
     }
 
     disableRecording() {
+
         this.recordingEnabled = false;
+        console.log('disableRecording recordingEnabled: '+this.recordingEnabled);
         this.stopRecording();
     }
 }

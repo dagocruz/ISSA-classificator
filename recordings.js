@@ -9,6 +9,7 @@ const AudioRecorder = require('./audio-recorder.js').AudioRecorder
  */
 
 const bitNumber = 16
+//Number of sources 
 const nChannels = 4
 
 /*
@@ -118,6 +119,7 @@ const audioServer = new AudioSocket()
 process.on('message', m => {
     switch(m.event) {
         case 'new-recording':
+            console.log('recordings.js new-recording');
             audioRecorders[m.index].startRecording(m.id);
             break;
 
@@ -126,6 +128,7 @@ process.on('message', m => {
             break;
 
         case 'start-recording':
+            console.log('record.js start-recording');
             audioRecorders.forEach(recorder => {
                 recorder.enableRecording(m.workspace);
             });
@@ -136,7 +139,6 @@ process.on('message', m => {
                 recorder.disableRecording();
             });
             break;
-
         default:
             console.warn(`Unhandled main process message ${m}`);
             break;

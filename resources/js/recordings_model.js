@@ -5,6 +5,7 @@ const fs = require('fs');
 const info = require('wav-file-info');
 const dialog = require('electron').remote.dialog;
 const speechToText = require('./../resources/js/speech-to-text.js');
+//var isRecording = false;
 
 // Fuzzy recording class
 class FuzzyRecording {
@@ -151,6 +152,9 @@ const RecordingsModel = new Vue({
     recordingEnabled: false,
     filter: '',
     hovering: null,
+    soundName: 'default',
+    isRecording: false,
+    available: false
   },
   computed: {
       transcription: function() {
@@ -162,7 +166,11 @@ const RecordingsModel = new Vue({
       },
       selectedFuzzyRecordings: function() {
           return this.fuzzyRecordings.filter(recording => {return recording.filename.includes(this.filter)});
+      },
+      isDisabledToRecord: function(){
+        return !this.available;
       }
+
   },
   methods: {
     removeRecording(filepath) {
@@ -176,6 +184,7 @@ const RecordingsModel = new Vue({
     }
   }
 })
+
 
 // Changing Workspace
 const changeWorkspace = function() {
@@ -196,6 +205,57 @@ const changeWorkspace = function() {
           ipcRenderer.send('start-recording', path)
         }
   })
+}
+
+// Changing Workspace for ISSA app
+const changeWorkspaceISSA = function() {
+  console.log("Changing workspace...")
+
+  dialog.showOpenDialog(
+    { properties: ['openDirectory'], title: 'Chooser workspace folder'},
+      function (files) {
+
+        if(files) {
+
+          let path = files[0]
+          RecordingsModel.workspacePath = path
+          localStorage.workspacePath = path
+          createList(path)
+          
+          ipcRenderer.send('stop-recording')
+          ipcRenderer.send('start-recording', path)
+        }
+  })
+}
+
+var dataRecord = {}; 
+
+ipcRenderer.on('available-to-record', (event, index, id, available) => {
+  RecordingsModel.available = available;
+  dataRecord.index = index;
+  dataRecord.id = id;
+  
+});
+
+
+// Starting a new record
+
+const startRecording = function(){
+  ipcRenderer.send('stop-recording');
+  ipcRenderer.send('start-recording', path.join(RecordingsModel.workspacePath,RecordingsModel.soundName));
+  console.log('Starting a record');
+  RecordingsModel.isRecording = true;
+  setTimeout(function(){
+    ipcRenderer.send('new-recording',dataRecord.index,dataRecord.id);
+  },300);  
+}
+
+// Stoping and saving a record
+
+const stopRecording = function(){
+  console.log('Stoping a record');
+  RecordingsModel.isRecording = false;
+  ipcRenderer.send('end-recording',dataRecord.index);
 }
 
 // Create file list
@@ -260,7 +320,8 @@ const recordControl = function() {
 // Receive recordings from main process
 
 ipcRenderer.on('add-recording', (event, filename) => {
-
+    console.log('Window add-recording');
+    RecordingsModel.isRecording = false;
     const fuzzy = RecordingsModel.fuzzyRecordings.filter(recording => recording.path === filename)[0]
     RecordingsModel.recordings.unshift(new Recording(filename, fuzzy.transcription + fuzzy.potentialTranscription))
 
