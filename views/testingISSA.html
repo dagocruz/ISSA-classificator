@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Testing Module - ISSA</title>
+        <link href="../resources/css/bootstrap.css" rel="stylesheet">
+        <link href="../resources/css/bootstrap-toggle.min.css" rel="stylesheet">
+        <link href="../resources/css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar navbar-default bg-primary-issa navbar-fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" width="120" href="#"><span>Testing Module for ISSA</span></a>
+                </div>
+            </div>
+        </nav>
+        <div id="recordings-table" class="content">
+            <div class="container-fluid" style="position:fixed; top:50px; width:100%; background-color:white;  z-index:10; padding-top:10px">
+                <form action="#">
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            <label style="padding-top:6px" class="col-form-label">Workspace Path</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <input class="form-control" v-model="workspacePath" placeholder="Not defined" onclick="changeWorkspaceISSA()"/></input>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            <label style="padding-top:6px" class="col-form-label">Test Name</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <input class="form-control" v-model="testName" placeholder="Test name" /></input>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            
+                        </div>    
+                        <div class="col-xs-6">
+                            <button v-if="!isTesting" type="button" class="btn btn-danger btn-lg" style="width:100%" onclick = "startTesting()">
+                                <span class="control glyphicon glyphicon-play-circle font-weight-bold" ></span> Run Test
+                            </button>
+                            <button v-else type="button" class="btn btn-default btn-lg" style="width:100%" onclick = "stopTesting()">
+                              <span class="control glyphicon glyphicon-stop font-weight-bold"></span> Stop Test
+                          </button>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            <label style="padding-top:6px" class="col-form-label">Stage process</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <input class="form-control" v-model="labelTest"/></input>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer class="footer" style="position: fixed">
+            <div class="container-fluid bg-primary-issa">
+                <div class="row">
+                    <p class="col-xs-10 text-muted">ISSA recording app - A modification of the Graphic interface for ODAS library</p>
+                    <a href="javascript:quit()" class="col-xs-2 text-right">Close</a>
+                </div>
+            </div>
+        </footer>
+        <script>window.$ = window.jQuery = require('./../resources/js/jquery.min.js');</script>
+        <script src="./../resources/js/bootstrap.min.js"></script>
+        <script src="./../resources/js/bootstrap-toggle.min.js"></script>
+        <script src="./../resources/js/vue.js"></script>
+
+        <script src="./../resources/js/testing_model.js"></script>
+    </body>
+</html>
