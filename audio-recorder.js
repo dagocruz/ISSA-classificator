@@ -35,17 +35,19 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
         this.buffer = undefined;
         this.writer = undefined;
         this.path = undefined;
+        this.fileSize = 0;
+        this.audioLength = 0;
 
-        this.transcripter = new streamToText.Transcripter();
+        //this.transcripter = new streamToText.Transcripter();
 
-        this.transcripter.on('data', data => {
+        /*this.transcripter.on('data', data => {
             this.emit('fuzzy-transcript', this.path, data);
             console.log(data);
         });
 
         this.transcripter.on('error', err => {
             console.error(err);
-        });
+        });*/
     }
 
     receive(data) {
@@ -82,6 +84,16 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
                         console.warn(`Write stream ${this.index} is full\nHolding samples...`);
                         this.hold = true;
                     }
+
+                    this.fileSize+=data.length;
+                    //console.log('3-If data.size ='+this.fileSize);
+                    this.audioLength = (8*this.fileSize)/(bitNumber*1*appSettings.sampleRate);
+                    if(this.audioLength > 5.2){
+                      console.log('audio.length ='+this.audioLength);
+                      this.stopRecording();
+                    }
+
+                    
                 }
 
                 catch(err) {
@@ -94,7 +106,7 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
 
             }
 
-            this.transcripter.putData(data);
+            //this.transcripter.putData(data);
 
         }
     }
@@ -148,7 +160,8 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
                 this.active = true;
                 this.hold = false;
                 this.buffer = undefined;
-                this.transcripter.start();
+                this.fileSize = 0;
+                //this.transcripter.start();
             }
 
             catch(err) {
@@ -165,7 +178,7 @@ exports.AudioRecorder =  class AudioRecorder extends EventEmitter {
 
             this.active = false;
             console.log(`Recorder ${this.index} ended`);
-            this.transcripter.stop();
+            //this.transcripter.stop();
 
             console.log(`Registering header on recorder ${this.index}`);
             this.writer.end();

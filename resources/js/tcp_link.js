@@ -70,6 +70,7 @@ const processTracking = function(event, msg) {
                 currentFrame.sources[newMap[src.id]].id = src.id;
                 hasNewSource = true;
                 ipcRenderer.send('available-to-record',newMap[src.id],src.id,true);
+                ipcRenderer.send('available-to-test',newMap[src.id],src.id,true);
                 //ipcRenderer.send('new-recording',newMap[src.id],src.id)
             }
 
@@ -85,6 +86,7 @@ const processTracking = function(event, msg) {
     else{
         //console.log('no hay senial');
         ipcRenderer.send('available-to-record',null,null,false); 
+        ipcRenderer.send('available-to-test',null,null,false);
     }
 
     indexMap = newMap;
@@ -114,7 +116,6 @@ const processTracking = function(event, msg) {
 };
 
 ipcRenderer.on('newTracking', processTracking)
-
 /*
  * Potential sources socket
  */

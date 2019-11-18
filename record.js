@@ -9,6 +9,11 @@ const BrowserWindow = electron.BrowserWindow;
 const ipcMain = electron.ipcMain;
 var coordenadas = [];
 
+/* ISSA definition*/
+const ISSA = require('./issa').ISSA;
+
+let issa = new ISSA();
+
 /*
  * Start the recording process
  */
@@ -115,20 +120,70 @@ function createWindow () {
 
 ipcMain.on('open-recordings-window', createWindow);
 
+
+/* 
+* Creaci'on de la ventana para la gabaci'on de audios para ISSA
+*/
+
+let testingISSAWindow;
+
+function createWindowTestingISSA(){
+    if(recordingISSAWindow != null)
+        recordingISSAWindow.show();
+
+    else{
+        testingISSAWindow = new BrowserWindow({
+            width: 900, height: 700,
+            webPreferences: {
+                nodeIntegration : true
+            },
+            show:false
+        });
+
+        testingISSAWindow.loadURL(url.format({
+            pathname: path.join(__dirname, 'views/testingISSA.html'),
+            protocol: 'file:',
+            slashes: true
+        }));
+
+        // Emitted when the window is closed.
+        testingISSAWindow.on('closed', function () {
+            if(separatedProcess.connected)
+                separatedProcess.send({event:'stop-recording'});
+            testingISSAWindow = null;
+        });
+
+        testingISSAWindow.on('ready-to-show', function() {
+            testingISSAWindow.show()
+
+        });
+
+        //testingISSAWindow.webContents.openDevTools()
+    }
+};
+
+
+ipcMain.on('open-testing-ISSA',createWindowTestingISSA);
+
+
 /*
  * Pass commands between main process and recording process
  */
 
 // Receive from live and record window
 ipcMain.on('available-to-record', (event, index, id, available) =>{
-    //console.log('available-to-record',available);
+    //console.log('available-to-record ',available);
     if(recordingISSAWindow != null)
         recordingISSAWindow.webContents.send('available-to-record',index,id,available);
+    if(testingISSAWindow != null)
+        testingISSAWindow.webContents.send('available-to-test',index,id,available);
+
 });
 
 
 ipcMain.on('new-recording', (event, index, id) => {
     console.log('record.js new-recording');
+    testingISSAWindow.webContents.send('testing-process','Recognizing audio source...');
     coordenadas = [];
     if(separatedProcess.connected)
         separatedProcess.send({event:'new-recording', index:index, id:id});
@@ -162,6 +217,18 @@ ipcMain.on('stop-recording', (event) => {
         postfilteredProcess.send({event:'stop-recording'});
 });
 
+let isEnableToTest = false;
+let fileNameTest;
+ipcMain.on('start-testing', (event,filename) =>{
+    console.log('record.js start-testing');
+    fileNameTest = filename;
+    isEnableToTest = true;
+});
+
+ipcMain.on('stop-testing', (event) =>{
+    console.log('record.js stop-testing');
+    isEnableToTest = false;
+});
 
 ipcMain.on('add-coor', (event,coor) =>{
     coordenadas.push(coor);
@@ -170,17 +237,19 @@ ipcMain.on('add-coor', (event,coor) =>{
 // Receive from record process
 
 separatedProcess.on('message', m => {
-    if(recordingISSAWindow != null) {
+    if(recordingISSAWindow != null || testingISSAWindow != null) {
         switch(m.event) {
             case 'fuzzy-transcript':
-                recordingISSAWindow.webContents.send('fuzzy-transcript', m.filename, m.data);
+                //recordingISSAWindow.webContents.send('fuzzy-transcript', m.filename, m.data);
                 break;
 
             case 'fuzzy-recording':
-                recordingISSAWindow.webContents.send('fuzzy-recording', m.filename);
+                //recordingISSAWindow.webContents.send('fuzzy-recording', m.filename);
                 break;
 
             case 'add-recording':
+                console.log('run add-recording');
+                
                 var writerCSV = csvWriter({sendHeaders: false});
                 writerCSV.pipe(fs.createWriteStream('data_sounds.csv', {flags: 'a'}))
                 let x=0,y=0,z=0;
@@ -196,7 +265,11 @@ separatedProcess.on('message', m => {
                 }
                 writerCSV.write({name: m.filename, x: x, y: y, z:z});
                 writerCSV.end();
-                recordingISSAWindow.webContents.send('add-recording', m.filename);
+                //recordingISSAWindow.webContents.send('add-recording', m.filename);
+
+                //Agregar parte del modelo de clasificaci'on
+                issa.classifyAudio(m.filename,x,y,z,testingISSAWindow,fileNameTest);
+
                 break;
 
             default:

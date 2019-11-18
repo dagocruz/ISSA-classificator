@@ -237,6 +237,13 @@ ipcRenderer.on('available-to-record', (event, index, id, available) => {
   
 });
 
+ipcRenderer.on('available-to-test', (event, index, id, available) => {
+  RecordingsModel.available = available;
+  dataRecord.index = index;
+  dataRecord.id = id;
+  //startRecording(); 
+});
+
 
 // Starting a new record
 
